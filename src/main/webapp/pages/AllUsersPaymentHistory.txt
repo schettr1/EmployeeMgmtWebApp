@@ -1,0 +1,168 @@
+<html>
+<head>
+<title>AllUsersPaymentHistory Page</title>
+<%@ page import="com.s3s.jsp.model.*, com.s3s.jsp.services.*"%>
+<%@ page import="java.util.*"%>
+<%@ include file="header.jsp"%>
+<script
+	src="http://localhost:8080/GoldTeamProject/javascripts/jquery-3.3.1.min.js"></script>
+<script
+	src="http://localhost:8080/GoldTeamProject/javascripts/commonUtil.js"></script>
+<script
+	src="http://localhost:8080/GoldTeamProject/javascripts/selectCheckedBox.js"></script>
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<jsp:useBean id="login" class="com.s3s.jsp.model.Login" />
+<jsp:useBean id="consultant" class="com.s3s.jsp.model.Consultant" />
+<jsp:useBean id="payment" class="com.s3s.jsp.model.Payment" />
+<jsp:useBean id="consultantservice"
+	class="com.s3s.jsp.services.ConsultantService" scope="page" />
+<jsp:useBean id="loginservice" class="com.s3s.jsp.services.LoginService"
+	scope="page" />
+<jsp:useBean id="paymentservice"
+	class="com.s3s.jsp.services.PaymentService" scope="page" />
+<style>
+/*Footer at bottom of page */
+	html, body {
+	  height: 100%;
+	  margin: 0;
+	}
+	.wrapper {
+	  min-height: 67%;
+	
+	  /* Equal to height of footer */
+	  /* But also accounting for potential margin-bottom of last child */
+	  margin-bottom: -50px;
+	}
+	.footer,
+	.push {
+	  height: 50px;
+	}
+</style>
+</head>
+<body>
+
+	<%
+		String username = null;
+		String password = null;
+		String UP = session.getAttribute("LoggedInUser").toString();
+		System.out.println("Email Page: UP = " + UP);
+		if (UP != null) {
+			String[] UPs = UP.split(" ");
+			username = UPs[0];
+			password = UPs[1];
+			System.out.println("AllUsersPaymentHistory page: username = " + username);
+			System.out.println("AllUsersPaymentHistory page: password = " + password);
+		}
+		login.setUsername(username);
+		login.setPassword(password);
+		Login newLogin = new Login();
+		newLogin = loginservice.getConsultant_Type(login);
+		consultant = consultantservice.getConsultantById(newLogin.getU_id());
+		List<Payment> paymentList = new ArrayList<>();
+		paymentList = paymentservice.getAllPayments();
+		System.out.println("AllUsersPaymentHistory page: paymentList = " + paymentList.toString());
+	%>
+
+	<div class="container wrapper" >
+		<div style="float:right" class="text-info"> <a id="home" href="MainPage.jsp" class="glyphicon glyphicon-home"></a> &nbsp | &nbsp 
+			<span><i class="glyphicon glyphicon-user"><%=consultant.getFirstName() + consultant.getLastName() %></i></span>&nbsp | &nbsp
+			<span><a id="logout" href="../index.jsp" >Sign out</a></span>
+		</div>
+		<div>
+			<div style="display: inline-block">
+				<label>From date:</label><input class="form-control"
+					style="width: 200px" id="StartDate" type="date">
+			</div>
+			<div style="display: inline-block; margin-left: 50px">
+				<label>To date:</label><input class="form-control"
+					style="width: 200px" id="EndDate" type="date">
+			</div>
+			<div style="display: inline-block; margin-left: 20px">
+				<input  class="btn btn-info" id="SearchByDate" type="button"
+					value="Search">
+			</div>
+		</div>
+		<div>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<td><b>TxnID</b></td>
+						<td><b>FirstName</b></td>
+						<td><b>LastName</b></td>
+						<td><b>Date</b></td>
+						<td><b>Type</b></td>
+						<td><b>Amount</b></td>
+						<td><b>Image</b></td>
+					</tr>
+				</thead>
+				<tbody id="TableContent">
+					<%
+						for (Payment p : paymentList) {
+					%>
+					<tr class="clickable-row">
+						<td><%=p.getTransactionID()%></td>
+						<td><%=p.getFirstName()%></td>
+						<td><%=p.getLastName()%></td>
+						<td><%=p.getDate()%></td>
+						<td><%=p.getType()%></td>
+						<td><%=p.getAmount()%></td>
+						<%
+							if (p.getType().equals("check")) {
+						%>
+						<td align="left" class="DisplayCheckImage"><a
+							style="width: 600; height: 300"
+							href="http://localhost:8080/GoldTeamProject/Images/<%=p.getFileName()%>"
+							target="pdf-frame"><button id="DisplayCheckImage"
+									class="btn btn-default" style="margin-left: 12px">
+									<img
+										src="http://localhost:8080/GoldTeamProject/Images/check.png"
+										height="15px" width="15px" alt="Edit">
+								</button></a></td>
+						<%
+							} else {
+						%>
+						<td><a style="width: 600; height: 300" href="#"><label
+								id="DisplayCheckImage" style="margin-left: 12px"></label></a></td>
+						<%
+							}
+						%>
+					</tr>
+					<%
+						}
+					%>
+				</tbody>
+			</table>
+		</div>
+		<div class="clearfix">
+			<ul class="pagination pull-right">
+				<li class="disabled"><a href="#"><span
+						class="glyphicon glyphicon-chevron-left"></span></a></li>
+				<li class="active"><a href="#">1</a></li>
+				<li><a href="#">2</a></li>
+				<li><a href="#">3</a></li>
+				<li><a href="#">4</a></li>
+				<li><a href="#">5</a></li>
+				<li><a href="#"><span
+						class="glyphicon glyphicon-chevron-right"></span></a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="push"></div>
+	<div class="footer">
+		<%@ include file="footer.jsp"%>	
+	</div>
+</body>
+
+<script>
+	$(document).ready(function() {
+		$("#SearchByDate").click(function() {
+			var startDate = $("#StartDate").val();
+			var endDate = $("#EndDate").val();
+			alert(startDate + " " + endDate);
+		});
+	});
+</script>
+</html>

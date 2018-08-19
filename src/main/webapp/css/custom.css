@@ -1,0 +1,22 @@
+/*Index Page*/
+.current{
+	font-size:16px;
+}
+
+.head{
+  background: #4682B4;
+  margin-bottom: 10px;
+}
+.headerTitle{
+	color: white;
+}
+.current{
+	font-size:16px;
+}
+
+.foot{
+  background: #708090;
+}
+.footerTitle{
+  color: white;
+}
